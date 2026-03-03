@@ -97,6 +97,12 @@ def parse_dt(value: str | None) -> datetime | None:
 
 
 
+
+
+def get_admin_ids() -> set[int]:
+    raw = get_setting("admin_ids", DEFAULT_ADMIN_IDS)
+    return {int(x.strip()) for x in raw.split(",") if x.strip().isdigit()}
+
 def get_supported_domains() -> list[str]:
     raw = get_setting("supported_domains", "terabox.com,1024terabox.com")
     return [x.strip().lower() for x in raw.split(",") if x.strip()]
@@ -272,7 +278,7 @@ async def check_sub_callback(call: CallbackQuery) -> None:
 
 @dp.message(Command("admin"))
 async def admin_panel(message: Message) -> None:
-    admins = {int(x) for x in get_setting("admin_ids", "").split(",") if x.strip().isdigit()}
+    admins = get_admin_ids()
     if message.from_user.id not in admins:
         await message.answer("Only admins can use this command.")
         return
